@@ -1,14 +1,19 @@
+package synth;
 import java.lang.Math;
 import javax.sound.sampled.Clip;
 import lib.StdAudio;
 
-public class Synth {
+public class WaveGenerator {
 
-    //WRITME: wave sythesis
-    public void synth_sample(Clip sample) {
+    public WaveGenerator(){
     }
 
-    private double[] gen_square(double hz, double duration, double amplitude){
+    //WRITME: wave sythesis
+    public void gen_wavelet(Clip sample, double hz, double duration, double amplitude) {
+    }
+
+    
+    public double[] gen_square(double hz, double duration, double amplitude){
         int n = (int) (StdAudio.SAMPLE_RATE * duration);
         double[] a = new double[n+1];
         int counter = 0;
@@ -24,11 +29,8 @@ public class Synth {
         return a;
     }
 
-    public void synth_square(EqualTemperment.Note note, int octave, double duration, double velocity){
-       StdAudio.play(gen_square(EqualTemperment.getHz(note, octave),duration,velocity));
-    }
-
-    private double[] gen_sin(double hz, double duration, double amplitude){
+    
+    public double[] gen_sin(double hz, double duration, double amplitude){
         int n = (int) (StdAudio.SAMPLE_RATE * duration);
         double[] a = new double[n+1];
         for (int i = 0; i <= n; i++)
@@ -36,7 +38,6 @@ public class Synth {
         return a;
     }
 
-    public void synth_sin(EqualTemperment.Note note, int octave, double duration, double velocity){
-        StdAudio.play(gen_sin(EqualTemperment.getHz(note, octave),duration,velocity));
-    }
+    //WRITEME: saw and triangle waves, and pwm 
+    
 }

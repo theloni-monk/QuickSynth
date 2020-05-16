@@ -1,4 +1,4 @@
-
+package util;
 public class EqualTemperment {
     public enum Note {
         Af(0.943877069),
