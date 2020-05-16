@@ -2,7 +2,7 @@ package test;
 import lib.StdAudio;
 import synth.WaveGenerator;
 import util.EqualTemperment;
-public class TestWaveGenerator {
+class WaveGeneratorT{
     //public void synth_sin(){EqualTemperment.Note.C, 4, 1.0, 1.0);}
     public static void synth_sin(WaveGenerator synth, EqualTemperment.Note note, int octave, double duration, double velocity){
         StdAudio.play(synth.gen_sin(EqualTemperment.getHz(note, octave),duration,velocity));
