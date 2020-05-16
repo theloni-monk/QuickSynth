@@ -23,6 +23,9 @@ public class Oscillator extends WaveGenerator{
             case SQUARE:
                 output = gen_square(hz, duration, amplitude * this.level);
                 break;
+            case SAW:
+                output = gen_saw(hz, duration, amplitude * this.level);
+                break;
             //TODO: implement other wave types
             // other cases unimplemented
             default:
