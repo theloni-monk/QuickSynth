@@ -1,20 +1,18 @@
 package effects;
-import java.util.ArrayList;
+
+//TODO: write some useful effects
 
 public abstract class AbstractAffector {
     protected boolean on;
 
-    protected ArrayList<Double> settings;
-
-    protected AbstractAffector nextEffect;
-
-    public void connect(AbstractAffector nextEffect){
-        this.nextEffect = nextEffect;
-    }
+    protected double[] settings;
 
     public void toggle(){
         this.on = !this.on;
     }
 
-    public abstract double[] process(double[] input);
+    // overrided by child classes
+    public double[] process(double[] input){
+        return input;
+    };
 }
