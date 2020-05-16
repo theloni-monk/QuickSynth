@@ -8,11 +8,10 @@ public class WaveGenerator {
     public WaveGenerator(){
     }
 
-    //WRITME: wave sythesis
+    //WRITEME: wave sythesis
     public void gen_wavelet(Clip sample, double hz, double duration, double amplitude) {
     }
 
-    
     public double[] gen_square(double hz, double duration, double amplitude){
         int n = (int) (StdAudio.SAMPLE_RATE * duration);
         double[] a = new double[n+1];
@@ -29,7 +28,6 @@ public class WaveGenerator {
         return a;
     }
 
-    
     public double[] gen_sin(double hz, double duration, double amplitude){
         int n = (int) (StdAudio.SAMPLE_RATE * duration);
         double[] a = new double[n+1];
