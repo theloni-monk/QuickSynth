@@ -3,33 +3,38 @@ package synth;
 import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 import lib.StdAudio;
+
 import util.EqualTemperment;
+import util.EqualTemperment.Note;
+import effects.HpFilter;
 
 public class MonoSynth {
 
     final int chunkSize = (int)(StdAudio.SAMPLE_RATE / 100); // ~10ms chunk length
+
+    public Oscillator[] Oscs;
+    
+    public EffectChain chain; 
 
     LinkedBlockingQueue<double[]> playFrameBuffer; // contains info only for next however many frames
     class PlayerThread extends Thread{
         @Override
         public void run(){
             while(true){
-                try{StdAudio.play(playFrameBuffer.take());}
-                catch (InterruptedException e){
-                    return;
-                }
+                double[] frame;
+                try{frame = playFrameBuffer.take();}
+                catch (InterruptedException e){return;}
+                StdAudio.play(chain.process(frame)); // effects chain processes in real-ish time
             }
         }
     }
+
     private PlayerThread playerThread; // consumes and plays data from playFrameBuffer
-
-    public Oscillator[] Oscs;
     
-    public EffectChain chain; 
-
     public MonoSynth(){
-        this.Oscs = new Oscillator[] {new Oscillator(WaveType.SAW, 1)}; //, new Oscillator(WaveType.SIN, 0.7)};
+        this.Oscs = new Oscillator[] {new Oscillator(WaveType.TRIANGLE, 1)}; //, new Oscillator(WaveType.SIN, 0.7)};
         this.chain = new EffectChain();
+        this.chain.attach(new HpFilter(EqualTemperment.getHz(Note.G, 9)));
 
         this.playFrameBuffer = new LinkedBlockingQueue<double[]>();
 
@@ -44,7 +49,6 @@ public class MonoSynth {
             double[] wave = osc.gen_wave(EqualTemperment.getHz(note, octave),duration,velocity);
             for(int i = 0; i<output.length; i++){output[i]+=wave[i];} // combine oscillators
         }
-        output = chain.process(output);
 
         playFrameBuffer.clear(); // cancel whatever sound is playing and have the output start playing
         for(double[] frame: chunkIntoFrames(output)){
@@ -53,7 +57,7 @@ public class MonoSynth {
     }
 
     // chunks data into frames to be put ont the playFrameBuffer; note: stolen from stackoverflow
-    public double[][] chunkIntoFrames(double[] soundData){
+    private double[][] chunkIntoFrames(double[] soundData){
         int rest = soundData.length % chunkSize;  // if rest>0 then our last array will have less elements than the others 
         int chunks = soundData.length / chunkSize + (rest > 0 ? 1 : 0); // we may have to add an additional array for the 'rest'
         // now we know how many arrays we need and create our result array
