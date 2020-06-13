@@ -7,6 +7,10 @@ public abstract class AbstractAffector {
 
     protected double[] settings;
 
+    public AbstractAffector(){
+        this.on = true;
+    }
+
     public void toggle(){
         this.on = !this.on;
     }
