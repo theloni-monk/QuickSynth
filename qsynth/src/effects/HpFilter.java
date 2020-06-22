@@ -1,5 +1,6 @@
 package effects;
 import lib.StdAudio;
+
 public class HpFilter extends AbstractAffector{
 
     // settings[0] is the cutoff frequency
@@ -9,7 +10,11 @@ public class HpFilter extends AbstractAffector{
         this.settings = new double[]{hz};
     }
 
-    //TODO: constrain output
+    public void setCutoff(double hz){
+        this.settings[0] = hz;
+    }
+    
+    //FIXME: very weak
     @Override
     public double[] process(double[] input){
         //System.out.println("HP processing");
@@ -27,7 +32,7 @@ public class HpFilter extends AbstractAffector{
         output[0] = input[0];
 
         for(int i = 1; i < input.length; i++){
-            output[i] = alpha * (output[i-1] + input[i] - input[i-1]);
+            output[i] = constrain(alpha * (output[i-1] + input[i] - input[i-1]));
         }
 
         return output;

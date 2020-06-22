@@ -9,7 +9,10 @@ public class LpFilter extends AbstractAffector{
         this.settings = new double[]{hz};
     }
 
-    //TODO: constrain output
+    public void setCutoff(double hz){
+        this.settings[0] = hz;
+    }
+
     @Override
     public double[] process(double[] input){
         //System.out.println("LP processing");
@@ -27,7 +30,7 @@ public class LpFilter extends AbstractAffector{
         output[0] = input[0];
 
         for(int i = 1; i < input.length; i++){
-            output[i] = output[i-1] + (alpha * input[i] - output[i-1]); //FIXME: not sure ab this one
+            output[i] = constrain(output[i-1] + (alpha * input[i] - output[i-1]) ); 
         }
 
         return output;

@@ -1,7 +1,5 @@
 package effects;
 
-//TODO: write some useful effects
-
 public abstract class AbstractAffector {
     protected boolean on;
 
@@ -13,6 +11,10 @@ public abstract class AbstractAffector {
 
     public void toggle(){
         this.on = !this.on;
+    }
+    
+    public double constrain(double d){
+        return Math.min(Math.max(d,-1), 1);
     }
 
     // overrided by child classes
