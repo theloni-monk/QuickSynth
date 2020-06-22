@@ -5,50 +5,56 @@ import java.util.concurrent.LinkedBlockingQueue;
 import lib.StdAudio;
 
 import util.EqualTemperment;
-import util.EqualTemperment.Note;
-import effects.HpFilter;
+import effects.*;
 
 public class MonoSynth {
 
-    final int chunkSize = (int)(StdAudio.SAMPLE_RATE / 100); // ~10ms chunk length
+    final static int chunkSize = (int)(StdAudio.SAMPLE_RATE / 10); // ~10ms chunk length
 
-    public Oscillator[] Oscs;
+    public static Oscillator[] Oscs;
     
-    public EffectChain chain; 
+    public static EffectChain chain; 
 
-    LinkedBlockingQueue<double[]> playFrameBuffer; // contains info only for next however many frames
-    class PlayerThread extends Thread{
+    private static LinkedBlockingQueue<double[]> playFrameBuffer; // contains info only for next however many frames
+    private static class PlayerThread extends Thread{
         @Override
         public void run(){
             while(true){
                 double[] frame;
                 try{frame = playFrameBuffer.take();}
                 catch (InterruptedException e){return;}
-                StdAudio.play(chain.process(frame)); // effects chain processes in real-ish time
+                StdAudio.play(frame); //chain.process(frame)); // effects chain processes in real-ish time
             }
         }
     }
 
-    private PlayerThread playerThread; // consumes and plays data from playFrameBuffer
+    private static PlayerThread playerThread; // consumes and plays data from playFrameBuffer
     
-    public MonoSynth(){
-        this.Oscs = new Oscillator[] {new Oscillator(WaveType.TRIANGLE, 1)}; //, new Oscillator(WaveType.SIN, 0.7)};
-        this.chain = new EffectChain();
-        this.chain.attach(new HpFilter(EqualTemperment.getHz(Note.G, 9)));
+    static {init();}
 
-        this.playFrameBuffer = new LinkedBlockingQueue<double[]>();
+    private static void init(){
+        Oscs = new Oscillator[] {new Oscillator(WaveType.TRIANGLE, 1)}; //, new Oscillator(WaveType.SIN, 0.7)};
+        chain = new EffectChain();
+        chain.attach(new HpFilter(20));
+        chain.attach(new LpFilter(20000));
 
-        this.playerThread = new PlayerThread();
-        this.playerThread.start();
+        playFrameBuffer = new LinkedBlockingQueue<double[]>();
+
+        playerThread = new PlayerThread();
+        playerThread.start();
     }
     
     //writes to playBuffer;
-    public void play(EqualTemperment.Note note, int octave, double duration, double velocity){
+    public static void play(String note, double duration, double velocity){
+        double hz = EqualTemperment.getHz(note);
         double[] output = new double[(int)(StdAudio.SAMPLE_RATE*duration)];
-        for(Oscillator osc: this.Oscs){
-            double[] wave = osc.gen_wave(EqualTemperment.getHz(note, octave),duration,velocity);
+        for(Oscillator osc: Oscs){
+            double[] wave = osc.gen_wave(hz, duration,velocity);
             for(int i = 0; i<output.length; i++){output[i]+=wave[i];} // combine oscillators
         }
+
+        // processes note through effect chain
+        output = chain.process(output);
 
         playFrameBuffer.clear(); // cancel whatever sound is playing and have the output start playing
         for(double[] frame: chunkIntoFrames(output)){
@@ -57,7 +63,7 @@ public class MonoSynth {
     }
 
     // chunks data into frames to be put ont the playFrameBuffer; note: stolen from stackoverflow
-    private double[][] chunkIntoFrames(double[] soundData){
+    private static double[][] chunkIntoFrames(double[] soundData){
         int rest = soundData.length % chunkSize;  // if rest>0 then our last array will have less elements than the others 
         int chunks = soundData.length / chunkSize + (rest > 0 ? 1 : 0); // we may have to add an additional array for the 'rest'
         // now we know how many arrays we need and create our result array
