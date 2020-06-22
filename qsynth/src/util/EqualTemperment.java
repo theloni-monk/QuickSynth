@@ -1,6 +1,8 @@
 package util;
+import java.util.Map;
+import java.util.HashMap;
 public class EqualTemperment {
-    public enum Note {
+    public static enum Note {
         Af(0.943877069),
         A(1),
         As(1.05946),
@@ -23,19 +25,46 @@ public class EqualTemperment {
         private Note(double value) {
             this.value = value;
         }
+
         public double getValue() {
                 return value;
         }
     }
+
+    public static Map<String, Note> Map;
     
+    final static double baseFrequency = 110; // HARDCODED FOR NOW A1
 
-    final static double baseFrequency = 110; // HARDCODED FOR NOW
+    static{makeMap();}
+    private static void makeMap(){
+        Map = new HashMap<String, Note>();
+        Map.put("Af", Note.Af);
+        Map.put("A", Note.A);
+        Map.put("As", Note.As);
+        Map.put("Bf", Note.Bf);
+        Map.put("B", Note.B);
+        Map.put("C", Note.C);
+        Map.put("Cs", Note.Cs);
+        Map.put("Df", Note.Df);
+        Map.put("D", Note.D);
+        Map.put("Ds", Note.Ds);
+        Map.put("Ef", Note.Ef);
+        Map.put("E", Note.E);
+        Map.put("F", Note.F);
+        Map.put("Fs", Note.Fs);
+        Map.put("Gf", Note.Gf);
+        Map.put("G", Note.G);
+        Map.put("Gs", Note.Gs);
+    }
 
-
-    // returns hz value for note formated letter than octave i.e. F4
-    // WRITME
+    // returns hz value for note formated letter than octave i.e. F4 or Gs6; octave must be strictly between 0 and 10 (excluding both) 
     public static double getHz(String noteName){
-        return 0.0;
+        String name = noteName.toUpperCase();
+        int octave = Integer.parseInt(name.substring(name.length() - 1));
+        String note_string = name.substring(0, name.length() - 1);
+        Note note = Map.get(note_string);
+        
+        return getHz(note, octave);
     } 
 
     public static double getHz(Note note, int octave){
